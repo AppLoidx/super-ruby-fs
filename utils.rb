@@ -24,7 +24,7 @@ module Utils
   attach_function(
     :execute_xfs_operation,
     :execute_xfs_operation,
-    [:int, :pointer, :int, :pointer, :pointer],
+    [:int, :pointer, :pointer, :int, :pointer, :pointer],
     :void
   )
   attach_function(

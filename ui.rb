@@ -1,6 +1,7 @@
 require_relative 'utils'
-
+require_relative 'resp'
 require 'fiddle'
+
 
 include Utils
 
@@ -14,6 +15,11 @@ module UIModule
     address = ffi_pointer.to_i
     fiddle = ::Fiddle::Pointer.new(address)
     fiddle.to_s
+  end
+
+  def resp_struct_alloc()
+    return RespStruct.new
+    
   end
 
 
@@ -56,16 +62,28 @@ module UIModule
               Utils.add_argv(i, argv, tokens[i+1])
             end
             output = Utils.init_output_buffer
-            Utils.execute_xfs_operation(command, output, argc, argv, xfs_struct)
+            resp_struct = resp_struct_alloc();
+            Utils.execute_xfs_operation(command, output, resp_struct, argc, argv, xfs_struct)
             str = pointer_to_string(output)
             print(str)
+            
+
+            counter = 0
+            while resp_struct[:response][counter][0] != nil
+              print(resp_struct[:response][counter][0])
+              print("\n")
+              counter = counter + 1
+            end
+
             Utils.destroy_output_buffer(output)
             Utils.destroy_argv(argv, argc)
           end
         end
-      rescue Exception
-        puts("Hey, man, you an exception. Do with that somthg")
-        return
+        rescue => e
+          puts("Hey, man, you an exception. Do with that somthg")
+          puts "Error during processing: #{$!}"
+          puts "Backtrace:\n\t#{e.backtrace.join("\n\t")}"
+          return
       end
     end
 
